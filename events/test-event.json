@@ -1,0 +1,16 @@
+{
+  "version": "2.0",
+  "routeKey": "GET /hello",
+  "rawPath": "/hello",
+  "rawQueryString": "name=Ajara",
+  "queryStringParameters": {
+    "name": "Ajara"
+  },
+  "requestContext": {
+    "http": {
+      "method": "GET",
+      "path": "/hello"
+    }
+  },
+  "isBase64Encoded": false
+}
