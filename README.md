@@ -21,7 +21,7 @@ The API accepts a name as a query parameter and returns a personalized JSON gree
 }
 ```
 
-The project was developed using Python and AWS Management Console and tested using Postman.
+The project was developed using Python and the AWS Management Console and tested using Postman.
 
 ## 2. Project Objectives
 
@@ -95,7 +95,8 @@ aws-serverless-apigateway-project/
 │   ├── 12-api-gateway-stage-created.png
 │   ├── 13-api-gateway-prod-stage.png
 │   ├── 14-api-gateway-invoke-url.png
-│   └── 15-postman-live-api-test.png
+│   ├── 15-postman-live-api-test.png
+│   └── 16-postman-recreated-api-test.png
 │
 ├── tests/
 │
@@ -183,7 +184,7 @@ The Lambda function executed successfully and returned:
 
 ### Step 4: Create the API Using Amazon API Gateway
 
-An HTTP API was created in Amazon API Gateway.
+An HTTP API was created in Amazon API Gateway and integrated with the existing Lambda function.
 
 The API was configured with the following settings:
 
@@ -195,35 +196,76 @@ The API was configured with the following settings:
 | Integrated function | `serverless-greeting-api` |
 | Route | `GET /hello` |
 | Stage | `prod` |
+| AWS Region | `us-east-1` |
 
 The API Gateway integration connects the HTTP route to the Lambda function, allowing incoming requests to trigger the serverless application.
 
-### Step 5: Deploy the API
+### Step 5: Recreate and Deploy the API
 
-The API was deployed to the `prod` stage.
+The original API Gateway resource was deleted and subsequently recreated. The new HTTP API was configured to use the existing Lambda function.
+
+The recreated API retained the same route and stage configuration:
+
+- Route: `GET /hello`
+- Stage: `prod`
+- Integration: `serverless-greeting-api`
+
+The new API Gateway Invoke URL is:
 
 **API Gateway Invoke URL:**
 
 ```text
-https://t4yxrb0bla.execute-api.us-east-1.amazonaws.com/prod
+https://rv4qjf6w51.execute-api.us-east-1.amazonaws.com/prod
 ```
 
 **Complete API endpoint:**
 
 ```text
-https://t4yxrb0bla.execute-api.us-east-1.amazonaws.com/prod/hello?name=Ajara
+https://rv4qjf6w51.execute-api.us-east-1.amazonaws.com/prod/hello
 ```
+
+**Personalized greeting endpoint:**
+
+```text
+https://rv4qjf6w51.execute-api.us-east-1.amazonaws.com/prod/hello?name=Ajara
+```
+
+The previous API Gateway endpoint is no longer in use.
 
 ## 7. Testing the Live API
 
-Postman was used to test the deployed API endpoint.
+Postman was used to test the recreated API Gateway endpoint.
+
+Two GET requests were performed to verify the default and personalized greeting functionality.
+
+### Test 1: Default Greeting
+
+| Test Configuration | Value |
+|---|---|
+| HTTP method | GET |
+| Endpoint | `/prod/hello` |
+| Expected response | `Hello, World!` |
+| Actual result | Successful |
+| HTTP status | 200 OK |
+
+**API response:**
+
+```json
+{
+  "message": "Hello, World!",
+  "status": "success"
+}
+```
+
+### Test 2: Personalized Greeting
 
 | Test Configuration | Value |
 |---|---|
 | HTTP method | GET |
 | Endpoint | `/prod/hello?name=Ajara` |
-| Expected status code | 200 OK |
+| Expected response | `Hello, Ajara!` |
 | Actual result | Successful |
+| HTTP status | 200 OK |
 
 **API response:**
 
@@ -234,7 +276,7 @@ Postman was used to test the deployed API endpoint.
 }
 ```
 
-The live API test was successful. The API received the request, invoked the Lambda function, processed the query parameter, and returned the expected JSON response.
+Both tests were successful. The API received the requests, invoked the Lambda function, processed the query parameters, and returned the expected JSON responses.
 
 ## 8. Project Screenshots
 
@@ -300,15 +342,19 @@ The following screenshots document the AWS configuration, deployment, and testin
 
 ![Production stage](screenshots/13-api-gateway-prod-stage.png)
 
-**API Gateway Invoke URL**
+**Original API Gateway Invoke URL**
 
-![API Invoke URL](screenshots/14-api-gateway-invoke-url.png)
+![Original API Invoke URL](screenshots/14-api-gateway-invoke-url.png)
 
 ### 8.5 Live API Testing
 
-**Successful API request using Postman**
+**Original API test**
 
-![Successful Postman API test](screenshots/15-postman-live-api-test.png)
+![Original Postman API test](screenshots/15-postman-live-api-test.png)
+
+**Successful test of the recreated API Gateway**
+
+![Recreated API Postman test](screenshots/16-postman-recreated-api-test.png)
 
 ## 9. Key Learnings
 
@@ -322,6 +368,7 @@ Through this project, I gained practical experience in:
 - Returning structured JSON responses.
 - Testing a deployed API using Postman.
 - Understanding the role of CloudWatch in Lambda monitoring.
+- Recreating an API Gateway resource and reconnecting it to an existing Lambda function.
 - Organizing and documenting a cloud project for a technical portfolio.
 
 ## 10. Cost Considerations
@@ -343,9 +390,8 @@ Possible improvements include:
 - Add additional API routes.
 - Implement input validation and error handling.
 - Introduce API authentication and authorization.
-- Add automated unit tests.
+- Expand automated unit testing.
 - Use AWS SAM or Terraform for infrastructure as code.
-- Implement CI/CD using GitHub Actions.
 - Improve monitoring and alerting using CloudWatch.
 - Add Amazon DynamoDB for persistent data storage.
 
@@ -353,6 +399,8 @@ Possible improvements include:
 
 This project demonstrates how AWS Lambda and Amazon API Gateway can be used together to build and deploy a functional serverless API.
 
-By completing this implementation, I gained practical experience in developing a Python-based Lambda function, configuring API Gateway integrations, deploying an HTTP API, and testing a live endpoint using Postman.
+By completing this implementation, I gained practical experience in developing a Python-based Lambda function, configuring API Gateway integrations, deploying an HTTP API, and testing live endpoints using Postman.
+
+The recreation of the API Gateway also provided practical experience in restoring an API endpoint and reconnecting it to an existing Lambda function.
 
 The project provides a foundation for exploring more advanced serverless application development and AWS cloud engineering practices.
