@@ -1,0 +1,68 @@
+
+name: Lambda CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - "feature/**"
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run Lambda Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
+  deploy:
+    name: Deploy Lambda to AWS
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+          role-session-name: GitHubActionsLambdaDeploy
+
+      - name: Package Lambda function
+        run: |
+          mkdir package
+          cp lambda/handler.py package/lambda_function.py
+          cd package
+          zip -r ../function.zip .
+
+      - name: Deploy Lambda function
+        run: |
+          aws lambda update-function-code \
+            --function-name serverless-greeting-api \
+            --zip-file fileb://function.zip
+
+      - name: Wait for Lambda update
+        run: aws lambda wait function-updated --function-name serverless-greeting-api
